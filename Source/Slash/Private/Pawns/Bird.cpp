@@ -6,6 +6,7 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 ABird::ABird()
 {
@@ -22,11 +23,6 @@ ABird::ABird()
 	AutoPossessPlayer = EAutoReceiveInput::Player0;
 }
 
-//callback function
-void ABird::MoveForwardOld(float Value)
-{
-	UE_LOG(LogTemp, Warning, TEXT("Move Forward: %f"), Value);
-}
 
 void ABird::BeginPlay()
 {
@@ -51,16 +47,31 @@ void ABird::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
-	PlayerInputComponent->BindAxis(FName("MoveForward"), this, &ABird::MoveForwardOld);
+	//PlayerInputComponent->BindAxis(FName("MoveForward"), this, &ABird::MoveForwardOld);
+	
 	if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent)) {
-		EnhancedInputComponent->BindAction()
+		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ABird::Move);
 	}
 }
 
-
-void ABird::MoveForward(const FInputActionValue& Value)
+//callback function old
+void ABird::MoveForwardOld(float Value)
 {
-	const FVector2D CurrentValue = Value.Get<FVector2D>();
+	if ((Controller) && (Value != 0.f)) {
+		FVector Forward = GetActorForwardVector();
+		AddMovementInput(Forward, Value);
+	}
+}
+
+//callback function new
+void ABird::Move(const FInputActionValue& Value)
+{
+	const float DirectionalValue = Value.Get<float>();
+
+	if ((Controller) && (DirectionalValue != 0.f)) {
+		FVector Forward = GetActorForwardVector();
+		AddMovementInput(Forward, DirectionalValue);
+	}
 }
 
 

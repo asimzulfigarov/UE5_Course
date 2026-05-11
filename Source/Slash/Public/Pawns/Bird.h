@@ -11,6 +11,7 @@ class UCapsuleComponent;
 class USkeletalMeshComponent;
 class UInputMappingContext;
 class UInputAction;
+class UCharacterMovementComponent;
 
 UCLASS()
 class SLASH_API ABird : public APawn
@@ -24,7 +25,7 @@ public:
 protected:
 	virtual void BeginPlay() override;
 	void MoveForwardOld(float Value);
-	void MoveForward(const FInputActionValue& Value);
+	void Move(const FInputActionValue& Value);
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
@@ -36,4 +37,6 @@ private:
 	UCapsuleComponent* Capsule;
 	UPROPERTY(VisibleAnywhere)
 	USkeletalMeshComponent* BirdMesh;
+	UPROPERTY(VisibleAnywhere)
+	UCharacterMovementComponent* MovementComponent;
 };
