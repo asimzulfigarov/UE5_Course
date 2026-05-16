@@ -11,7 +11,8 @@ class UCapsuleComponent;
 class USkeletalMeshComponent;
 class UInputMappingContext;
 class UInputAction;
-class UCharacterMovementComponent;
+class USpringArmComponent;
+class UCameraComponent;
 
 UCLASS()
 class SLASH_API ABird : public APawn
@@ -26,17 +27,23 @@ protected:
 	virtual void BeginPlay() override;
 	void MoveForwardOld(float Value);
 	void Move(const FInputActionValue& Value);
-
+	void TurnOld(float Value);
+	void LookUpOld(float Value);
+	void Look(const FInputActionValue& Value);
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
 	UInputMappingContext* BirdMappingContext;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
 	UInputAction* MoveAction;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
+	UInputAction* LookAction;
 private:
 	UPROPERTY(VisibleAnywhere)
 	UCapsuleComponent* Capsule;
 	UPROPERTY(VisibleAnywhere)
 	USkeletalMeshComponent* BirdMesh;
 	UPROPERTY(VisibleAnywhere)
-	UCharacterMovementComponent* MovementComponent;
+	USpringArmComponent* SpringArm;
+	UPROPERTY(VisibleAnywhere)
+	UCameraComponent* Camera;
 };

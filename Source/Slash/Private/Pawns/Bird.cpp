@@ -6,7 +6,9 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
-#include "GameFramework/CharacterMovementComponent.h"
+#include "GameFramework/SpringArmComponent.h"
+#include "Camera/CameraComponent.h"
+
 
 ABird::ABird()
 {
@@ -19,6 +21,13 @@ ABird::ABird()
 
 	BirdMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("BirdMesh"));
 	BirdMesh->SetupAttachment(GetRootComponent());
+
+	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
+	SpringArm->SetupAttachment(GetRootComponent());
+	SpringArm->TargetArmLength = 300.f;
+
+	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
+	Camera->SetupAttachment(SpringArm);
 
 	AutoPossessPlayer = EAutoReceiveInput::Player0;
 }
@@ -48,16 +57,19 @@ void ABird::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 	//PlayerInputComponent->BindAxis(FName("MoveForward"), this, &ABird::MoveForwardOld);
+	//PlayerInputComponent->BindAxis(FName("Turn"), this, &ABird::TurnOld);
+	//PlayerInputComponent->BindAxis(FName("LookUp"), this, &ABird::LookUpOld);
 	
 	if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent)) {
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ABird::Move);
+		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ABird::Look);
 	}
 }
 
 //callback function old
 void ABird::MoveForwardOld(float Value)
 {
-	if ((Controller) && (Value != 0.f)) {
+	if ((GetController()) && (Value != 0.f)) {
 		FVector Forward = GetActorForwardVector();
 		AddMovementInput(Forward, Value);
 	}
@@ -65,14 +77,34 @@ void ABird::MoveForwardOld(float Value)
 
 //callback function new
 void ABird::Move(const FInputActionValue& Value)
-{
+{ 
 	const float DirectionalValue = Value.Get<float>();
 
-	if ((Controller) && (DirectionalValue != 0.f)) {
+	if ((GetController()) && (DirectionalValue != 0.f)) {
 		FVector Forward = GetActorForwardVector();
 		AddMovementInput(Forward, DirectionalValue);
 	}
 }
 
 
+// Old Functions
 
+void ABird::TurnOld(float Value) {
+	if ((GetController()) && (Value != 0.f)) {
+		AddControllerYawInput(Value);
+	}
+}
+void ABird::LookUpOld(float Value) {
+	if ((GetController()) && (Value != 0.f)) {
+		AddControllerPitchInput(Value);
+	}
+}
+
+
+void ABird::Look(const FInputActionValue& Value) {
+	const FVector2D LookAxisValue = Value.Get<FVector2D>();
+	if (GetController()) {
+		AddControllerYawInput(LookAxisValue.X);
+		AddControllerPitchInput(LookAxisValue.Y);
+	}
+} 
