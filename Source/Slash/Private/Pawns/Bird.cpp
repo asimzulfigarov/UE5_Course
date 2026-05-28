@@ -81,12 +81,6 @@ void ABird::Move(const FInputActionValue& Value)
 	const float DirectionalValue = Value.Get<float>();
 
 	if ((GetController()) && (DirectionalValue != 0.f)) {
-		GEngine->AddOnScreenDebugMessage(
-			-1,
-			5.f,
-			FColor::Green,
-			TEXT("Hello World")
-		);
 		FVector Forward = GetActorForwardVector();
 		AddMovementInput(Forward, DirectionalValue);
 	}
