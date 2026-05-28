@@ -79,6 +79,8 @@ DerivedDataCache/*
 # =========================
 Content/__ExternalActors__/
 Content/__ExternalObjects__/
+Content/ThirdParty/
+Content/Fab/
 
 # =========================
 # ADDED (important fixes)
