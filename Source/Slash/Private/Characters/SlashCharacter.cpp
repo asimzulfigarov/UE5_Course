@@ -13,6 +13,10 @@
 ASlashCharacter::ASlashCharacter()
 {
 	PrimaryActorTick.bCanEverTick = true;
+
+	bUseControllerRotationPitch = false;
+	bUseControllerRotationYaw = false;
+	bUseControllerRotationRoll = false;
 	
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
 	SpringArm->SetupAttachment(GetRootComponent());
@@ -43,18 +47,27 @@ void ASlashCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 	if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent)) {
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ASlashCharacter::Move);
+		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ASlashCharacter::Look);
 	}
 }
 
-void ASlashCharacter::Move(const FInputActionValue & Value) {
-	const FVector2D DirectionalValue = Value.Get<FVector2D>();
+void ASlashCharacter::Move(const FInputActionValue& Value) {
+	
+	const FVector2D MovementVector = Value.Get<FVector2D>();
 
-	if (DirectionalValue.Y != 0.f) {
-		FVector ForwardVector = GetActorForwardVector();
-		AddMovementInput(ForwardVector, DirectionalValue.Y);
-	}
-	if (DirectionalValue.X != 0.f) {
-		FVector RightVector = GetActorRightVector();
-		AddMovementInput(RightVector, DirectionalValue.X);
+	const FRotator Rotation = GetControlRotation();
+	const FRotator YawRotation(0.f, Rotation.Yaw, 0.f);
+
+	const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+	AddMovementInput(ForwardDirection, MovementVector.Y);
+	const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+	AddMovementInput(RightDirection, MovementVector.X);
+}
+
+void ASlashCharacter::Look(const FInputActionValue& Value) {
+	const FVector2D LookAxisValue = Value.Get<FVector2D>();
+	if (GetController()) {
+		AddControllerYawInput(LookAxisValue.X);
+		AddControllerPitchInput(LookAxisValue.Y);
 	}
 }

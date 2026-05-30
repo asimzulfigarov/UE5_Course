@@ -25,11 +25,14 @@ public:
 protected:
 	virtual void BeginPlay() override;
 	void Move(const FInputActionValue& Value);
+	void Look(const FInputActionValue& Value);
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
 	UInputMappingContext* MappingContext;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
 	UInputAction* MoveAction;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
+	UInputAction* LookAction;
 private:
 	UPROPERTY(VisibleAnywhere)
 	USpringArmComponent* SpringArm;
